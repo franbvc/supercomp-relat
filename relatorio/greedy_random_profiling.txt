@@ -1,0 +1,221 @@
+--------------------------------------------------------------------------------
+Profile data file 'callgrind.out.61082' (creator: callgrind-3.19.0)
+--------------------------------------------------------------------------------
+I1 cache: 
+D1 cache: 
+LL cache: 
+Timerange: Basic block 0 - 492278
+Trigger: Program termination
+Profiled target:  ./greedy_random --benchmark (PID 61082, part 1)
+Events recorded:  Ir
+Events shown:     Ir
+Event sort order: Ir
+Thresholds:       0.01
+Include dirs:     
+User annotated:   greedy_random.cpp
+Auto-annotation:  on
+
+--------------------------------------------------------------------------------
+Ir                 
+--------------------------------------------------------------------------------
+2,564,092 (100.0%)  PROGRAM TOTALS
+
+--------------------------------------------------------------------------------
+Ir                file:function
+--------------------------------------------------------------------------------
+490,354 (19.12%)  ./elf/../sysdeps/generic/dl-new-hash.h:_dl_lookup_symbol_x
+
+--------------------------------------------------------------------------------
+-- User-annotated source: greedy_random.cpp
+--------------------------------------------------------------------------------
+Ir             
+
+-- line 8 ----------------------------------------
+    .           
+    .           using namespace std;
+    .           
+    .           vector<int> setCategoryVector(int totalCategories);
+    .           vector<Movie> setMovieVector(int totalMovies);
+    .           
+    .           bool tryToAddMovie(vector<Movie> &watchlist, Movie &movie, bool timetable[24], int &freeSlots);
+    .           bool sortSmallerDuration(Movie &i, Movie &j) { return i.duration < j.duration; };
+6,132 ( 0.24%)  bool sortSmallerEndTime(Movie &i, Movie &j) { return i.endTime < j.endTime; };
+    .           bool sortSmallerId(Movie &i, Movie &j) { return i.id < j.id; };
+    .           
+    .           void printResult(vector<Movie> &watchlist, bool timetable[24]);
+    .           
+    .           // Implementacao com heuristica gulosa (menor duracao)
+    .           int main(int argc, char **argv)
+    9 ( 0.00%)  {
+    3 ( 0.00%)      bool timetable[24] = {false};
+    1 ( 0.00%)      int freeTimetableSlots = 24;
+    .               int totalMovies;
+    .               int totalCategories;
+    .           
+   12 ( 0.00%)      cin >> totalMovies >> totalCategories;
+8,518 ( 0.33%)  => ???:std::istream::operator>>(int&) (2x)
+  696 ( 0.03%)  => ./elf/../sysdeps/x86_64/dl-trampoline.h:_dl_runtime_resolve_xsave (1x)
+    .           
+    3 ( 0.00%)      vector<int> categoryCount = setCategoryVector(totalCategories);
+10,780 ( 0.42%)  => greedy_random.cpp:setCategoryVector(int) (1x)
+    3 ( 0.00%)      vector<Movie> movies = setMovieVector(totalMovies);
+644,006 (25.12%)  => greedy_random.cpp:setMovieVector(int) (1x)
+    .               vector<Movie> watchlist;
+    .           
+    .               sort(movies.begin(), movies.end(), sortSmallerEndTime);
+    .           
+    .               // Gerador
+    .               default_random_engine generator;
+    .               generator.seed(10);
+    .           
+    .               uniform_real_distribution<double> distribution(0.0, 1.0);
+    .           
+    .               int i = 1; // posicao e filme nao adicionado
+    .           
+  605 ( 0.02%)      for (auto &movie : movies)
+    .               {
+  599 ( 0.02%)          if (freeTimetableSlots == 0)
+    .                       break;
+    .           
+  800 ( 0.03%)          if (movie.startTime > movie.endTime || movie.startTime == movie.endTime)
+    .                   {
+    .                       i++;
+    .                       continue;
+    .                   }
+    .           
+2,394 ( 0.09%)          if (categoryCount[movie.category - 1] <= 0)
+    .                   {
+    .                       i++;
+    .                       continue;
+    .                   }
+    .           
+    .                   if (tryToAddMovie(watchlist, movie, timetable, freeTimetableSlots))
+   35 ( 0.00%)              categoryCount[movie.category - 1]--;
+    .           
+  490 ( 0.02%)          if (distribution(generator) > 0.75 && i < totalMovies)
+    .                   {
+   40 ( 0.00%)              uniform_int_distribution<int> distributionInt(i, totalMovies - 1);
+    .                       int p = distributionInt(generator);
+    .           
+  160 ( 0.01%)              if (movies[p].startTime > movies[p].endTime || movies[p].startTime == movies[p].endTime)
+    .                       {
+    .                           i++;
+    .                           continue;
+    .                       }
+    .           
+  240 ( 0.01%)              if (categoryCount[movies[p].category - 1] <= 0)
+    .                       {
+    .                           i++;
+    .                           continue;
+    .                       }
+    .           
+  228 ( 0.01%)              if (tryToAddMovie(watchlist, movies[p], timetable, freeTimetableSlots))
+1,150 ( 0.04%)  => greedy_random.cpp:tryToAddMovie(std::vector<Movie, std::allocator<Movie> >&, Movie&, bool*, int&) (38x)
+    .                       {
+   30 ( 0.00%)                  categoryCount[movies[p].category - 1]--;
+    .                           movies.erase(movies.begin() + p);
+    5 ( 0.00%)                  totalMovies--;
+    .                       }
+    .                   }
+    .           
+    5 ( 0.00%)          i++;
+    .               }
+    .           
+    2 ( 0.00%)      if (argc <= 1)
+    .               {
+    .                   sort(watchlist.begin(), watchlist.end(), sortSmallerId);
+    .                   printResult(watchlist, timetable);
+    .               }
+    .           
+    2 ( 0.00%)      if (argv[1] == string("--benchmark"))
+    .               {
+    .                   cout << watchlist.size() << " " << count(timetable, timetable + 24, false);
+    .               }
+    .           
+    .               return 0;
+    9 ( 0.00%)  }
+    .           
+    .           vector<int> setCategoryVector(int totalCategories)
+    8 ( 0.00%)  {
+    .               vector<int> categoryVector;
+    .               categoryVector.reserve(totalCategories);
+    .           
+    .               int categoryLimit;
+   30 ( 0.00%)      for (int i = 0; i < totalCategories; i++)
+    .               {
+   40 ( 0.00%)          cin >> categoryLimit;
+9,670 ( 0.38%)  => ???:std::istream::operator>>(int&) (10x)
+    .                   categoryVector.push_back(categoryLimit);
+    .               }
+    .           
+    .               return categoryVector;
+    8 ( 0.00%)  }
+    .           
+    .           vector<Movie> setMovieVector(int totalMovies)
+    9 ( 0.00%)  {
+    .               vector<Movie> movieVector;
+    .               movieVector.reserve(totalMovies);
+    .           
+    .               int id, duration, category, startTime, endTime;
+    .           
+  600 ( 0.02%)      for (int i = 0; i < totalMovies; i++)
+    .               {
+2,401 ( 0.09%)          cin >> startTime >> endTime >> category;
+636,588 (24.83%)  => ???:std::istream::operator>>(int&) (600x)
+    .                   id = i;
+  800 ( 0.03%)          duration = endTime - startTime;
+    .           
+1,800 ( 0.07%)          movieVector.push_back({id, duration, category, startTime, endTime});
+    .               }
+    .               return movieVector;
+    9 ( 0.00%)  }
+    .           
+    .           bool tryToAddMovie(vector<Movie> &watchlist, Movie &movie, bool timetable[24], int &freeSlots)
+   77 ( 0.00%)  {
+  450 ( 0.02%)      for (int i = movie.startTime; i < movie.endTime; i++)
+    .               {
+  454 ( 0.02%)          if (timetable[i])
+   66 ( 0.00%)              return false;
+    .               }
+    .           
+   39 ( 0.00%)      for (int i = movie.startTime; i < movie.endTime; i++)
+    .               {
+   80 ( 0.00%)          timetable[i] = true;
+  783 ( 0.03%)  => ./elf/../sysdeps/x86_64/dl-trampoline.h:_dl_runtime_resolve_xsave (1x)
+  112 ( 0.00%)  => ./string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:__memset_avx2_unaligned_erms (7x)
+   96 ( 0.00%)          freeSlots--;
+    .                   // cout << freeSlots << endl;
+    .               }
+    .           
+    .               watchlist.push_back(movie);
+    5 ( 0.00%)      return true;
+    6 ( 0.00%)  }
+    .           
+    .           void printResult(vector<Movie> &watchlist, bool timetable[24])
+    .           {
+    .               cout << "Movies to watch: " << watchlist.size() << "\n";
+    .               cout << "Free timetable slots: " << count(timetable, timetable + 24, false) << "\n";
+    .           
+    .               cout << "\n";
+    .               cout << "ID | Start Time | End Time | Category";
+-- line 165 ----------------------------------------
+-- line 167 ----------------------------------------
+    .           
+    .               for (auto &movie : watchlist)
+    .               {
+    .                   cout << movie.id << " | ";
+    .                   cout << setfill('0') << setw(2) << movie.startTime << " | ";
+    .                   cout << setfill('0') << setw(2) << movie.endTime << " | ";
+    .                   cout << movie.category << "\n";
+    .               }
+    2 ( 0.00%)  }
+--------------------------------------------------------------------------------
+The following files chosen for auto-annotation could not be found:
+--------------------------------------------------------------------------------
+  ./elf/../sysdeps/generic/dl-new-hash.h
+
+--------------------------------------------------------------------------------
+Ir              
+--------------------------------------------------------------------------------
+18,787 ( 0.73%)  events annotated
+
