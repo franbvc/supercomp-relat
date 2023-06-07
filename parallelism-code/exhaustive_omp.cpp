@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <math.h>
+#include <omp.h>
 #include "movie.h"
 #include "utils.h"
 
@@ -17,7 +18,6 @@ int main()
 
     // Define last binary for movie combinations
     int maxBin = (int)pow(2, movieCount) - 1;
-    cout << "Max Binary: " << maxBin << endl;
 
     // sort movies by increasing end time
     sort(movies.begin(), movies.end(), [](Movie &i, Movie &j)
@@ -25,15 +25,22 @@ int main()
 
     int maxMovies = 0;
 
-#pragma omp parallel for reduction(max : maxMovies)
+#pragma omp parallel for
     for (int i = 1; i <= maxBin; i++)
     {
         if (__builtin_popcount(i) > 24)
             continue;
-        maxMovies = max(maxMovies, validateInput(i, movies, categoryLimit, movieCount));
+
+        int combinationMovies = validateInput(i, movies, categoryLimit, movieCount);
+
+#pragma omp critical
+        {
+            if (combinationMovies > maxMovies)
+                maxMovies = combinationMovies;
+        }
     }
 
-    cout << maxMovies << endl;
+    cout << maxBin << " " << maxMovies;
 
     return 0;
 }

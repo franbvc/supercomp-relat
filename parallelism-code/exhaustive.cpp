@@ -17,7 +17,6 @@ int main()
 
     // Define last binary for movie combinations
     int maxBin = (int)pow(2, movieCount) - 1;
-    cout << "Max Binary: " << maxBin << endl;
 
     // sort movies by increasing end time
     sort(movies.begin(), movies.end(), [](Movie &i, Movie &j)
@@ -32,7 +31,7 @@ int main()
         maxMovies = max(maxMovies, validateInput(i, movies, categoryLimit, movieCount));
     }
 
-    cout << maxMovies << endl;
+    cout << maxBin << " " << maxMovies;
 
     return 0;
 }
